@@ -2,47 +2,45 @@ import { usePlayerStore } from "../../stores/usePlayerStore"
 import { useEffect, useRef } from "react"
 
 const AudioPlayer = () => {
-  const audioRef = useRef<HTMLAudioElement>(null)
-  const prevSongRef = useRef<string | null>(null)
+	const audioRef = useRef<HTMLAudioElement>(null);
+	const prevSongRef = useRef<string | null>(null);
 
-  const { isPlaying, currentSong, playNext } = usePlayerStore()
+	const { currentSong, isPlaying, playNext } = usePlayerStore();
 
-  useEffect(() => {
-    if (isPlaying) audioRef?.current?.play()
-    else audioRef?.current?.pause()
-  }, [isPlaying])
+	useEffect(() => {
+		if (isPlaying) audioRef.current?.play();
+		else audioRef.current?.pause();
+	}, [isPlaying]);
 
-  useEffect(() => {
-    const audio = audioRef.current
+	useEffect(() => {
+		const audio = audioRef.current;
 
-    const handleEnded = () => {
-      playNext()
-    }
+		const handleEnded = () => {
+			playNext();
+		};
 
-    audio?.addEventListener('ended', handleEnded)
+		audio?.addEventListener("ended", handleEnded);
 
-    return () => {
-      audio?.removeEventListener('ended', handleEnded)
-    }
-  }, [playNext])
+		return () => audio?.removeEventListener("ended", handleEnded);
+	}, [playNext]);
 
-  useEffect(() => {
-    if(!audioRef.current || !currentSong) return
+	useEffect(() => {
+		if (!audioRef.current || !currentSong) return;
 
-    const audio = audioRef.current
+		const audio = audioRef.current;
 
-    const isSongChange = prevSongRef.current !== currentSong.audioUrl
+		const isSongChange = prevSongRef.current !== currentSong?.audioUrl;
+		if (isSongChange) {
+			audio.src = currentSong?.audioUrl;
+			audio.currentTime = 0;
 
-    if(isSongChange) {
-      audio.src = currentSong.audioUrl
-      audio.currentTime = 0
+			prevSongRef.current = currentSong?.audioUrl;
 
-      prevSongRef.current = currentSong.audioUrl
-      if(isPlaying) audio.play()
-    }
-  }, [currentSong, isPlaying])
+			if (isPlaying) audio.play();
+		}
+	}, [currentSong, isPlaying]);
 
-  return <audio />
-}
+	return <audio ref={audioRef} />;
+};
 
-export default AudioPlayer
+export default AudioPlayer;
