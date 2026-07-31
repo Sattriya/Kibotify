@@ -9,7 +9,7 @@
     "skipLibCheck": true,
 
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./src/*"]
     },
     "ignoreDeprecations": "6.0",
 
