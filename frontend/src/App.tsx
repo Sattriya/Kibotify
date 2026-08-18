@@ -5,6 +5,8 @@ import { AuthenticateWithRedirectCallback } from "@clerk/react";
 import MainLayout from "./layouts/MainLayout";
 import ChatPage from "./pages/chat/ChatPage";
 import AlbumPage from "./pages/album/AlbumPage";
+import AdminPage from "./pages/admin/AdminPage";
+import { Toaster } from "react-hot-toast"
 
 function App() {
   return (
@@ -17,7 +19,10 @@ function App() {
         </Route>
         <Route path="/sso-callback" element={<AuthenticateWithRedirectCallback />} />
         <Route path="/auth-callback" element={<AuthCallbackPage />} />
+        <Route path="/admin" element={<AdminPage />} />
+        <Route path="*" element={<NotFoundPage />}/>
       </Routes>
+      <Toaster />
     </>
   )
 }

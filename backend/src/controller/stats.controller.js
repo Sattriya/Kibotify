@@ -32,7 +32,7 @@ export const getAllStats = async (req, res, next) => {
             totalSongs,
             totalAlbums,
             totalUsers,
-            totalArtist: uniqueArtist[0]?.count || 0
+            totalArtists: uniqueArtist[0]?.count || 0
         })
     } catch (error) {
         next(error)

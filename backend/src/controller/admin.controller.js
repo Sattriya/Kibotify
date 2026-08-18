@@ -1,5 +1,5 @@
-import {Song} from "../models/song.model.js";
-import {Album} from "../models/album.model.js"
+import { Song } from "../models/song.model.js";
+import { Album } from "../models/album.model.js"
 import cloudinary from "../lib/cloudinary.js";
 
 const uploadToCloudinary = async (file) => {
@@ -59,11 +59,14 @@ export const deleteSong = async (req, res, next) => {
         const song = await Song.findById(id)
 
         if (song.albumId) {
-            await Album.findByIdAndUpdate({
-                $pull: {
-                    songs: song._id
+            await Album.updateOne(
+                { _id: song.albumId },
+                {
+                    $pull: {
+                        songs: song._id
+                    }
                 }
-            })
+            )
         }
 
         await Song.findByIdAndDelete(id)

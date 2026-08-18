@@ -4,15 +4,22 @@ import { useEffect } from "react"
 import FeaturedSection from "./components/FeaturedSection.tsx"
 import { ScrollArea } from "../../components/ui/scroll-area.tsx"
 import SectionGrid from "./components/SectionGrid.tsx"
+import { usePlayerStore } from "../../stores/usePlayerStore.ts"
 
 const HomePage = () => {
-  const { fetchFeaturedSongs, fetchMadeForYouSongs, fetchTrendingSongs, madeForYouSongs, trendingSongs, isLoading } = useMusicStore()
+  const { fetchFeaturedSongs, fetchMadeForYouSongs, fetchTrendingSongs, madeForYouSongs, trendingSongs, featuredSongs, isLoading } = useMusicStore()
+
+  const {initializeQueue} = usePlayerStore()
 
   useEffect(() => {
     fetchFeaturedSongs()
     fetchMadeForYouSongs()
     fetchTrendingSongs()
   }, [fetchFeaturedSongs, fetchMadeForYouSongs, fetchTrendingSongs])
+
+  useEffect(() => {
+    initializeQueue([...featuredSongs, ...madeForYouSongs, ...trendingSongs])
+  }, [initializeQueue, featuredSongs, madeForYouSongs, trendingSongs])
 
   return (
     <main className="rounded-md overflow-hidden h-full bg-linear-to-b from-zinc-800 to-zinc-900">

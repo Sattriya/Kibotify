@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import axios from "../lib/axios"
 import { Loader } from "lucide-react"
 import { useAuthStore } from "../stores/useAuthStore"
+import { useChatStore } from "../stores/useChatStore"
 
 const updateApiToken = async (token: string | null) => {
     if (token) {
@@ -15,7 +16,8 @@ const updateApiToken = async (token: string | null) => {
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const { getToken, userId } = useAuth();
     const [isLoading, setIsLoading] = useState(true);
-    const {checkAdminStatus} = useAuthStore()
+    const { checkAdminStatus } = useAuthStore()
+    const { initSocket, disconnectSocket } = useChatStore()
 
     useEffect(() => {
         const initAuth = async () => {
@@ -23,10 +25,12 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 const token = await getToken()
                 updateApiToken(token)
 
-                if(token) {
+                if (token) {
                     await checkAdminStatus()
+
+                    if (userId) initSocket(userId)
                 }
-                
+
             } catch (err) {
                 updateApiToken(null)
                 console.log(err)
@@ -36,7 +40,9 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
 
         initAuth()
-    }, [getToken, userId])
+
+        return () => disconnectSocket()
+    }, [getToken, userId, checkAdminStatus, initSocket, disconnectSocket])
 
     if (isLoading) {
         return (

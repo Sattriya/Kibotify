@@ -14,13 +14,13 @@ const formatDuration = (seconds: number) => {
 
 const AlbumPage = () => {
     const { albumId } = useParams()
-    const { fetchAlbumById, currentAlbum, isLoading } = useMusicStore()
+    const { fetchAlbumsById, currentAlbum, isLoading } = useMusicStore()
 
     const { currentSong, isPlaying, playAlbum, tooglePlay } = usePlayerStore()
 
     useEffect(() => {
-        if (albumId) fetchAlbumById(albumId)
-    }, [albumId, fetchAlbumById])
+        if (albumId) fetchAlbumsById(albumId)
+    }, [albumId, fetchAlbumsById])
 
     if (isLoading) return null
 

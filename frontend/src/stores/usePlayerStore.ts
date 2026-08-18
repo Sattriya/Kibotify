@@ -1,5 +1,6 @@
 import type { Song } from '../types'
 import { create } from 'zustand'
+import { useChatStore } from './useChatStore'
 
 interface PlayerStore {
     currentSong: Song | null,
@@ -13,6 +14,7 @@ interface PlayerStore {
     tooglePlay: () => void,
     playNext: () => void,
     playPrevious: () => void,
+    updateActivity: (song?: Song) => void
 }
 
 export const usePlayerStore = create<PlayerStore>((set, get) => ({
@@ -20,6 +22,16 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
     isPlaying: false,
     queue: [],
     currentIndex: -1,
+
+    updateActivity: (song) => {
+        const socket = useChatStore.getState().socket
+        if (socket) {
+            socket.emit('update_activity', {
+                userId: socket.auth.userId,
+                activity: song ? `Playing ${song.title} by ${song.artist}` : 'Idle'
+            })
+        }
+    },
 
     initializeQueue: (songs) => {
         set({
@@ -34,6 +46,8 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
 
         const song = songs[startIndex]
 
+        get().updateActivity(song)
+
         set({
             queue: songs,
             isPlaying: true,
@@ -45,6 +59,8 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
     setCurrentSong: (song: Song | null) => {
         if (!song) return
 
+        get().updateActivity(song)
+
         const songIndex = get().queue.findIndex(s => s._id == song._id)
         set({
             isPlaying: true,
@@ -52,17 +68,29 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
             currentIndex: songIndex !== -1 ? songIndex : get().currentIndex
         })
     },
+
     tooglePlay: () => {
         const willStartPlaying = !get().isPlaying
+        const currentSong = get().currentSong
+
+        const socket = useChatStore.getState().socket
+        if (socket) {
+            socket.emit('update_activity', {
+                userId: socket.auth.userId,
+                activity: willStartPlaying && currentSong ? `Playing ${currentSong.title} by ${currentSong.artist}` : 'Idle'
+            })
+        }
 
         set({ isPlaying: willStartPlaying })
     },
+
     playNext: () => {
         const { currentIndex, queue } = get()
         const nextIndex = currentIndex + 1
 
         if (nextIndex < queue.length) {
             const nextSong = queue[nextIndex]
+            get().updateActivity(nextSong)
             set({
                 isPlaying: true,
                 currentSong: nextSong,
@@ -70,6 +98,7 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
             })
         } else {
             set({ isPlaying: false })
+            get().updateActivity()
         }
     },
     playPrevious: () => {
@@ -78,6 +107,7 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
 
         if (prevIndex >= 0) {
             const prevSong = queue[prevIndex]
+            get().updateActivity(prevSong)
             set({
                 isPlaying: true,
                 currentSong: prevSong,
@@ -85,6 +115,7 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
             })
         } else {
             set({ isPlaying: false })
+            get().updateActivity()
         }
     },
 }))

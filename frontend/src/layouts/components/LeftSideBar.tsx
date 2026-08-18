@@ -12,11 +12,11 @@ const LeftSideBar = () => {
     const { isSignedIn } = useAuth();
     const isLoading = false
 
-    const { albums, fetchAlbum } = useMusicStore()
+    const { albums, fetchAlbums } = useMusicStore()
 
     useEffect(() => {
-        fetchAlbum()
-    }, [fetchAlbum])
+        fetchAlbums()
+    }, [fetchAlbums])
 
     return (
         <div className='h-full flex flex-col gap-2'>
