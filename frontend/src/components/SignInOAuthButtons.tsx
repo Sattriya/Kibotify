@@ -3,18 +3,9 @@ import { useSignIn } from "@clerk/react/legacy";
 import { Button } from "./ui/button";
 
 const SignInOAuthButtons = () => {
-    const { signIn, fetchStatus } = useSignIn();
-
-    // if (fetchStatus !== "fetching") {
-    //     return;
-    // }
-
+    const { signIn } = useSignIn();
+    
     const signInWithGoogle = async () => {
-        // const { error } = await signIn.sso({
-        //     strategy: "oauth_google",
-        //     redirectUrl: "/auth-callback",
-        //     redirectCallbackUrl: "/sso-callback",
-        // });
 
         await signIn?.authenticateWithRedirect({
             strategy: "oauth_google",

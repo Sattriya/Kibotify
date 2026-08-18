@@ -43,16 +43,16 @@ const PlayBackControls = () => {
 
     }, [currentSong])
 
-    const handleSeek = (value: number[]) => {
+    const handleSeek = (value: number | readonly number[]) => {
         if (audioRef.current) {
-            audioRef.current.currentTime = value[0]
+            const v = Array.isArray(value) ? value[0] : value
+            audioRef.current.currentTime = v
         }
     }
 
     return (
         <footer className='h-20 sm:h-24 bg-zinc-900 border-t border-zinc-800 px-4'>
             <div className='flex justify-between items-center h-full max-w-[1800px] mx-auto'>
-                {/* currently playing song */}
                 <div className='hidden sm:flex items-center gap-4 min-w-[180px] w-[30%]'>
                     {currentSong && (
                         <>
@@ -73,7 +73,6 @@ const PlayBackControls = () => {
                     )}
                 </div>
 
-                {/* player controls*/}
                 <div className='flex flex-col items-center gap-2 flex-1 max-w-full sm:max-w-[45%]'>
                     <div className='flex items-center gap-4 sm:gap-6'>
                         <Button
@@ -155,9 +154,10 @@ const PlayBackControls = () => {
                             step={1}
                             className='w-24 hover:cursor-grab active:cursor-grabbing'
                             onValueChange={(value) => {
-                                setVolume(value[0]);
+                                const v = Array.isArray(value) ? value[0] : value
+                                setVolume(v);
                                 if (audioRef.current) {
-                                    audioRef.current.volume = value[0] / 100;
+                                    audioRef.current.volume = v / 100;
                                 }
                             }}
                         />

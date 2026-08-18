@@ -22,7 +22,7 @@ interface ChatStore {
     setSelectedUser: (user: User | null) => void
 }
 
-const baseUrl = 'http://localhost:3000'
+const baseUrl = import.meta.env.MODE == "development" ? "http://localhost:3000" : "/"
 
 const socket = io(baseUrl, {
     autoConnect: false,
@@ -113,23 +113,23 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 
     sendMessage: (senderId, receiverId, content) => {
         const socket = get().socket
-        if(!socket) return
+        if (!socket) return
 
-        socket.emit('send_message', {senderId, receiverId, content})
+        socket.emit('send_message', { senderId, receiverId, content })
     },
 
     fetchMessages: async (userId) => {
-        set({isLoading: true, error: false})
+        set({ isLoading: true, error: null })
 
         try {
             const response = await axiosInstance.get(`/users/messages/${userId}`)
-            set({messages: response.data})
+            set({ messages: response.data })
         } catch (error: any) {
-            set({error: error.response.data.message})
+            set({ error: error.response.data.message })
         } finally {
-            set({isLoading: false})
+            set({ isLoading: false })
         }
     },
 
-    setSelectedUser: (user) => set({selectedUser: user})
+    setSelectedUser: (user) => set({ selectedUser: user })
 }))
