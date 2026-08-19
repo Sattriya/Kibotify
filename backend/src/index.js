@@ -47,6 +47,7 @@ cron.schedule('0 * * * *', () => {
     }
 })
 
+app.get("/api/test", (req, res) => res.json({message: "Backend terbaca"}))
 app.use("/api/users", userRoutes)
 app.use("/api/admin", adminRoutes)
 app.use("/api/auth", authRoutes)
