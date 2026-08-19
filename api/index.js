@@ -1,3 +1,3 @@
-const app = require("../backend/index.js");
+const app = require("../backend/src/index.js");
 
 export default app
