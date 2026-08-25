@@ -1,6 +1,6 @@
 import { Button } from "../../../components/ui/button"
 import SectionGridSkeleton from "../../../components/skeletons/SectionGridSkeleton"
-import type { Song } from "../../../types"
+import type { Song } from "../../../stores/types"
 import PlayButton from "./PlayButton"
 
 type SectionGridProps = {

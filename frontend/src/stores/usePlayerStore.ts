@@ -1,4 +1,4 @@
-import type { Song } from '../types'
+import type { Song } from './types'
 import { create } from 'zustand'
 import { useChatStore } from './useChatStore'
 
@@ -25,9 +25,10 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
 
     updateActivity: (song) => {
         const socket = useChatStore.getState().socket
+        if(socket.auth?.userId)
         if (socket) {
             socket.emit('update_activity', {
-                userId: socket.auth.userId,
+                userId: socket.auth?.userId,
                 activity: song ? `Playing ${song.title} by ${song.artist}` : 'Idle'
             })
         }
@@ -74,11 +75,14 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
         const currentSong = get().currentSong
 
         const socket = useChatStore.getState().socket
-        if (socket) {
-            socket.emit('update_activity', {
-                userId: socket.auth.userId,
-                activity: willStartPlaying && currentSong ? `Playing ${currentSong.title} by ${currentSong.artist}` : 'Idle'
-            })
+        
+        if (socket.auth?.userId) {
+            if (socket) {
+                socket.emit('update_activity', {
+                    userId: socket.auth.userId,
+                    activity: willStartPlaying && currentSong ? `Playing ${currentSong.title} by ${currentSong.artist}` : 'Idle'
+                })
+            }
         }
 
         set({ isPlaying: willStartPlaying })

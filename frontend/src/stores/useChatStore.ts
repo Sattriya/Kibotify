@@ -1,4 +1,4 @@
-import type { Message, User } from "../types";
+import type { Message, User } from "./types";
 import axiosInstance from "../lib/axios";
 import { create } from "zustand"
 import { io } from "socket.io-client"
