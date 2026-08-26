@@ -11,7 +11,6 @@ Platform streaming musik full-stack terinspirasi Spotify, dilengkapi dashboard a
 - [Struktur Folder](#struktur-folder)
 - [Getting Started](#getting-started)
 - [Environment Variables](#environment-variables)
-- [Deployment](#deployment)
 - [Known Issues & Roadmap](#known-issues--roadmap)
 - [Lisensi](#lisensi)
 
@@ -109,16 +108,6 @@ Ringkasan singkat (lihat README masing-masing untuk daftar lengkap & penjelasan)
 **Backend (`backend/.env`)**: `PORT`, `FRONTEND_URL`, `MONGO_URI`, `ADMIN_EMAIL`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `NODE_ENV`, `CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`
 
 **Frontend (`frontend/.env.local`)**: `VITE_CLERK_PUBLISHABLE_KEY`
-
-## Deployment
-
-Project ini dikonfigurasi untuk deploy ke **Vercel** sebagai satu project:
-
-- `vercel.json` di root melakukan rewrite semua request `/api/*` ke serverless function `api/index.js`
-- `api/index.js` meng-import Express app dari `backend/src/index.js` dan mengekspornya sebagai handler serverless
-- Frontend di-build ke `frontend/dist` dan disajikan sebagai static site
-
-⚠️ **Socket.io butuh koneksi WebSocket yang persisten**, sedangkan Vercel serverless function bersifat stateless/short-lived. Inilah alasan utama kenapa fitur chat real-time hanya berjalan mulus di local development dan belum stabil di production. Untuk mendukung real-time chat di production, backend perlu dijalankan di platform yang mendukung *long-lived connection* (misalnya Railway, Render, VPS, atau layanan real-time pihak ketiga seperti Ably/Pusher).
 
 ## Known Issues & Roadmap
 
