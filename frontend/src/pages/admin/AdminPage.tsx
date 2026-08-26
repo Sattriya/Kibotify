@@ -10,18 +10,20 @@ import { useMusicStore } from "../../stores/useMusicStore"
 import { useEffect } from "react"
 
 const AdminPage = () => {
-    const { isAdmin } = useAuthStore()
+    const { isAdmin, checkAdminStatus } = useAuthStore()
     const navigate = useNavigate()
 
     const {fetchAlbums, fetchSongs, fetchStats} = useMusicStore()
 
     useEffect(() => {
+        checkAdminStatus()
         fetchAlbums()
         fetchSongs()
         fetchStats()
-    }, [fetchAlbums, fetchSongs, fetchStats])
+    }, [fetchAlbums, fetchSongs, fetchStats, checkAdminStatus])
 
     if (!isAdmin) navigate('/')
+
     return (
         <div
             className='min-h-screen bg-linear-to-b from-zinc-900 via-zinc-900

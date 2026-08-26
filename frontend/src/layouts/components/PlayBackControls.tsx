@@ -5,7 +5,7 @@ import { Laptop2, ListMusic, Mic2, Pause, Play, Repeat, Shuffle, SkipBack, SkipF
 import { useEffect, useRef, useState } from "react"
 
 const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60) 
+    const minutes = Math.floor(seconds / 60)
     const remainingSeconds = Math.floor(seconds % 60)
     return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`
 }
@@ -133,8 +133,9 @@ const PlayBackControls = () => {
                     </div>
                 </div>
 
-                <div className='hidden sm:flex items-center gap-4 min-w-[180px] w-[30%] justify-end'>
-                    {/* <Button size='icon' variant='ghost' className='hover:text-white text-zinc-400'>
+                {/* volume controls */}
+                <div className='flex items-center gap-4 min-w-[180px] w-[30%] justify-end'>
+                    <Button size='icon' variant='ghost' className='hover:text-white text-zinc-400'>
                         <Mic2 className='h-4 w-4' />
                     </Button>
                     <Button size='icon' variant='ghost' className='hover:text-white text-zinc-400'>
@@ -142,7 +143,7 @@ const PlayBackControls = () => {
                     </Button>
                     <Button size='icon' variant='ghost' className='hover:text-white text-zinc-400'>
                         <Laptop2 className='h-4 w-4' />
-                    </Button> */}
+                    </Button>
 
                     <div className='flex items-center gap-2'>
                         <Button size='icon' variant='ghost' className='hover:text-white text-zinc-400'>

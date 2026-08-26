@@ -1,19 +1,24 @@
 import { UserButton } from "@clerk/react";
+import { ArrowBigLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Header = () => {
 	return (
 		<div className='flex items-center justify-between'>
 			<div className='flex items-center gap-3 mb-8'>
-				<Link to='/' className='rounded-lg'>
-					<img src='/kibotify.png' className='h-10 w-8 text-black' />
-				</Link>
+				<img src='/kibotify.png' className='h-10 w-8 text-black' />
 				<div>
 					<h1 className='text-3xl font-bold'>Music Manager</h1>
 					<p className='text-zinc-400 mt-1'>Manage your music catalog</p>
 				</div>
 			</div>
-			<UserButton />
+			<div className='flex items-center gap-3 mb-8'>
+				<Link to='/' className='rounded-lg flex mr-4 bg-zinc-800 px-4 py-2 hover:bg-zinc-600'>
+					<ArrowBigLeft className="mr-1"/>
+					Back
+				</Link>
+				<UserButton />
+			</div>
 		</div>
 	);
 };

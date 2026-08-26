@@ -43,6 +43,25 @@ const AddSongDialog = () => {
     const audioInputRef = useRef<HTMLInputElement>(null)
     const imageInputRef = useRef<HTMLInputElement>(null)
 
+    const handleAudioChange = (file: File) => {
+        setFiles((prev) => ({ ...prev, audio: file }))
+
+        const objectUrl = URL.createObjectURL(file)
+        const audio = new Audio(objectUrl)
+
+        audio.addEventListener("loadedmetadata", () => {
+            if (isFinite(audio.duration)) {
+                setNewSong((prev) => ({ ...prev, duration: Math.round(audio.duration).toString() }))
+            }
+            URL.revokeObjectURL(objectUrl)
+        })
+
+        audio.addEventListener("error", () => {
+            toast.error("Could not read audio duration, please enter it manually")
+            URL.revokeObjectURL(objectUrl)
+        })
+    }
+
     const handleSubmit = async () => {
         setIsloading(true)
 
@@ -104,12 +123,24 @@ const AddSongDialog = () => {
                 </DialogHeader>
 
                 <div className='space-y-4 py-4'>
+                    <Input
+                        type='number'
+                        min='0'
+                        value={newSong.duration}
+                        onChange={(e) => setNewSong({ ...newSong, duration: e.target.value })}
+                        className='bg-zinc-800 border-zinc-700'
+                        hidden
+                    />
+
                     <input
                         type='file'
                         accept='audio/*'
                         ref={audioInputRef}
                         hidden
-                        onChange={(e) => setFiles((prev) => ({ ...prev, audio: e.target.files![0] }))}
+                        onChange={(e) => {
+                            const file = e.target.files?.[0]
+                            if (file) handleAudioChange(file)
+                        }}
                     />
 
                     <input
@@ -172,24 +203,13 @@ const AddSongDialog = () => {
                     </div>
 
                     <div className='space-y-2'>
-                        <label className='text-sm font-medium'>Duration (seconds)</label>
-                        <Input
-                            type='number'
-                            min='0'
-                            value={newSong.duration}
-                            onChange={(e) => setNewSong({ ...newSong, duration: e.target.value })}
-                            className='bg-zinc-800 border-zinc-700'
-                        />
-                    </div>
-
-                    <div className='space-y-2'>
                         <label className='text-sm font-medium'>Album (Optional)</label>
                         <Select
                             value={newSong.album}
                             onValueChange={(value) => setNewSong({ ...newSong, album: value ?? "" })}
                         >
                             <SelectTrigger className='bg-zinc-800 border-zinc-700'>
-                                <SelectValue placeholder="Select album"/>
+                                <SelectValue placeholder="Select album" />
                             </SelectTrigger>
                             <SelectContent className='bg-zinc-800 border-zinc-700'>
                                 <SelectItem value='none'>No Album (Single)</SelectItem>

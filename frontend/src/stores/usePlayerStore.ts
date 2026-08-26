@@ -25,12 +25,13 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
 
     updateActivity: (song) => {
         const socket = useChatStore.getState().socket
-        if(socket.auth?.userId)
-        if (socket) {
-            socket.emit('update_activity', {
-                userId: socket.auth?.userId,
-                activity: song ? `Playing ${song.title} by ${song.artist}` : 'Idle'
-            })
+        if (socket.auth?.userId) {
+            if (socket) {
+                socket.emit('update_activity', {
+                    userId: socket.auth?.userId,
+                    activity: song ? `Playing ${song.title} by ${song.artist}` : 'Idle'
+                })
+            }
         }
     },
 
@@ -75,7 +76,7 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
         const currentSong = get().currentSong
 
         const socket = useChatStore.getState().socket
-        
+
         if (socket.auth?.userId) {
             if (socket) {
                 socket.emit('update_activity', {
