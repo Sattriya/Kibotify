@@ -15,6 +15,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
     isLoading: false,
     error: null,
 
+    // Function untuk mengecek "apakah user saat ini ada admin" akan merubah state isAdmin menjadi true atau tetap false 
     checkAdminStatus: async () => {
         set({ error: null, isLoading: true })
         try {
@@ -27,6 +28,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
         }
     },
 
+    //function untuk mereset status admin
     reset: () => {
         set({ isAdmin: false, isLoading: false, error: null })
     }

@@ -8,6 +8,9 @@ import { ScrollArea } from "../../components/ui/scroll-area"
 import ChatHeader from "./components/ChatHeader"
 import MessageInput from "./components/MessageInput"
 
+// function ini digunakan untuk mengubah tanggal/waktu menjadi format jam yang lebih mudah dibaca.
+// contoh formatTime("2026-08-27T13:45:00")
+// menghasilkan 01:45 PM
 const formatTime = (date: string) => {
 	return new Date(date).toLocaleTimeString("en-US", {
 		hour: "2-digit",

@@ -24,10 +24,14 @@ interface NewSong {
 }
 
 const AddSongDialog = () => {
+    // mengambil data album dari music store
     const { albums } = useMusicStore()
+
+    // state untuk mengatur dialog dan loading
     const [isSongDialogOpen, setIsSongDialogOpen] = useState(false)
     const [isLoading, setIsloading] = useState(false)
 
+    // state untuk menyimpan data song yang akan dibuat
     const [newSong, setNewSong] = useState<NewSong>({
         title: "",
         artist: "",
@@ -35,46 +39,67 @@ const AddSongDialog = () => {
         duration: "0"
     })
 
-    const [files, setFiles] = useState<{ audio: File | null, image: File | null }>({
+    // state untuk menyimpan file audio dan image yang dipilih
+    const [files, setFiles] = useState<{
+        audio: File | null,
+        image: File | null
+    }>({
         audio: null,
         image: null
     })
 
+    // ref untuk mengakses input file secara langsung
     const audioInputRef = useRef<HTMLInputElement>(null)
     const imageInputRef = useRef<HTMLInputElement>(null)
 
+    // function untuk memilih file audio dan mendapatkan durasinya
     const handleAudioChange = (file: File) => {
-        setFiles((prev) => ({ ...prev, audio: file }))
+        setFiles((prev) => ({
+            ...prev,
+            audio: file
+        }))
 
+        // membuat URL sementara untuk membaca metadata audio
         const objectUrl = URL.createObjectURL(file)
         const audio = new Audio(objectUrl)
 
+        // mendapatkan durasi audio setelah metadata berhasil dibaca
         audio.addEventListener("loadedmetadata", () => {
             if (isFinite(audio.duration)) {
-                setNewSong((prev) => ({ ...prev, duration: Math.round(audio.duration).toString() }))
+                setNewSong((prev) => ({
+                    ...prev,
+                    duration: Math.round(audio.duration).toString()
+                }))
             }
+
             URL.revokeObjectURL(objectUrl)
         })
 
+        // menangani error ketika metadata audio tidak dapat dibaca
         audio.addEventListener("error", () => {
             toast.error("Could not read audio duration, please enter it manually")
             URL.revokeObjectURL(objectUrl)
         })
     }
 
+    // function untuk mengirim data song beserta file ke server
     const handleSubmit = async () => {
         setIsloading(true)
 
         try {
+            // memastikan file audio dan image sudah dipilih
             if (!files.audio || !files.image) {
                 return toast.error("Please upload both audio and image files");
             }
 
+            // menggunakan FormData karena data yang dikirim berupa file
             const formData = new FormData();
 
             formData.append("title", newSong.title);
             formData.append("artist", newSong.artist);
             formData.append("duration", newSong.duration);
+
+            // album bersifat optional, jadi hanya dikirim jika album dipilih
             if (newSong.album && newSong.album !== "none") {
                 formData.append("albumId", newSong.album);
             }
@@ -82,12 +107,14 @@ const AddSongDialog = () => {
             formData.append("audioFile", files.audio);
             formData.append("imageFile", files.image);
 
+            // mengirim data song ke API
             await axiosInstance.post("/admin/songs", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
             });
 
+            // mengembalikan form ke kondisi awal setelah berhasil
             setNewSong({
                 title: "",
                 artist: "",
@@ -99,6 +126,10 @@ const AddSongDialog = () => {
                 audio: null,
                 image: null,
             });
+
+            // menutup dialog setelah song berhasil dibuat
+            setIsSongDialogOpen(false)
+
             toast.success("Song added successfully");
         } catch (error: any) {
             toast.error("Failed to add song: " + error.message);
@@ -119,19 +150,28 @@ const AddSongDialog = () => {
             <DialogContent className='bg-zinc-900 border-zinc-700 max-h-[80vh] overflow-auto'>
                 <DialogHeader>
                     <DialogTitle>Add New Song</DialogTitle>
-                    <DialogDescription>Add a new song to your music library</DialogDescription>
+                    <DialogDescription>
+                        Add a new song to your music library
+                    </DialogDescription>
                 </DialogHeader>
 
                 <div className='space-y-4 py-4'>
+                    {/* input duration disembunyikan karena durasi otomatis diambil dari file audio */}
                     <Input
                         type='number'
                         min='0'
                         value={newSong.duration}
-                        onChange={(e) => setNewSong({ ...newSong, duration: e.target.value })}
+                        onChange={(e) =>
+                            setNewSong({
+                                ...newSong,
+                                duration: e.target.value
+                            })
+                        }
                         className='bg-zinc-800 border-zinc-700'
                         hidden
                     />
 
+                    {/* input audio disembunyikan dan dibuka melalui button Choose Audio File */}
                     <input
                         type='file'
                         accept='audio/*'
@@ -139,16 +179,25 @@ const AddSongDialog = () => {
                         hidden
                         onChange={(e) => {
                             const file = e.target.files?.[0]
-                            if (file) handleAudioChange(file)
+
+                            if (file) {
+                                handleAudioChange(file)
+                            }
                         }}
                     />
 
+                    {/* input image disembunyikan dan dibuka melalui area upload artwork */}
                     <input
                         type='file'
                         ref={imageInputRef}
                         className='hidden'
                         accept='image/*'
-                        onChange={(e) => setFiles((prev) => ({ ...prev, image: e.target.files![0] }))}
+                        onChange={(e) =>
+                            setFiles((prev) => ({
+                                ...prev,
+                                image: e.target.files![0]
+                            }))
+                        }
                     />
 
                     <div
@@ -158,16 +207,28 @@ const AddSongDialog = () => {
                         <div className='text-center'>
                             {files.image ? (
                                 <div className='space-y-2'>
-                                    <div className='text-sm text-emerald-500'>Image selected:</div>
-                                    <div className='text-xs text-zinc-400'>{files.image.name.slice(0, 20)}</div>
+                                    <div className='text-sm text-emerald-500'>
+                                        Image selected:
+                                    </div>
+                                    <div className='text-xs text-zinc-400'>
+                                        {files.image.name.slice(0, 20)}
+                                    </div>
                                 </div>
                             ) : (
                                 <>
                                     <div className='p-3 bg-zinc-800 rounded-full inline-block mb-2'>
                                         <Upload className='h-6 w-6 text-zinc-400' />
                                     </div>
-                                    <div className='text-sm text-zinc-400 mb-2'>Upload artwork</div>
-                                    <Button variant='outline' size='sm' className='text-xs'>
+
+                                    <div className='text-sm text-zinc-400 mb-2'>
+                                        Upload artwork
+                                    </div>
+
+                                    <Button
+                                        variant='outline'
+                                        size='sm'
+                                        className='text-xs'
+                                    >
                                         Choose File
                                     </Button>
                                 </>
@@ -176,45 +237,86 @@ const AddSongDialog = () => {
                     </div>
 
                     <div className='space-y-2'>
-                        <label className='text-sm font-medium'>Audio File</label>
+                        <label className='text-sm font-medium'>
+                            Audio File
+                        </label>
+
                         <div className='flex items-center gap-2'>
-                            <Button variant='outline' onClick={() => audioInputRef.current?.click()} className='w-full'>
-                                {files.audio ? files.audio.name.slice(0, 20) : "Choose Audio File"}
+                            <Button
+                                variant='outline'
+                                onClick={() => audioInputRef.current?.click()}
+                                className='w-full'
+                            >
+                                {files.audio
+                                    ? files.audio.name.slice(0, 20)
+                                    : "Choose Audio File"
+                                }
                             </Button>
                         </div>
                     </div>
 
                     <div className='space-y-2'>
-                        <label className='text-sm font-medium'>Title</label>
+                        <label className='text-sm font-medium'>
+                            Title
+                        </label>
+
                         <Input
                             value={newSong.title}
-                            onChange={(e) => setNewSong({ ...newSong, title: e.target.value })}
+                            onChange={(e) =>
+                                setNewSong({
+                                    ...newSong,
+                                    title: e.target.value
+                                })
+                            }
                             className='bg-zinc-800 border-zinc-700'
                         />
                     </div>
 
                     <div className='space-y-2'>
-                        <label className='text-sm font-medium'>Artist</label>
+                        <label className='text-sm font-medium'>
+                            Artist
+                        </label>
+
                         <Input
                             value={newSong.artist}
-                            onChange={(e) => setNewSong({ ...newSong, artist: e.target.value })}
+                            onChange={(e) =>
+                                setNewSong({
+                                    ...newSong,
+                                    artist: e.target.value
+                                })
+                            }
                             className='bg-zinc-800 border-zinc-700'
                         />
                     </div>
 
                     <div className='space-y-2'>
-                        <label className='text-sm font-medium'>Album (Optional)</label>
+                        <label className='text-sm font-medium'>
+                            Album (Optional)
+                        </label>
+
                         <Select
                             value={newSong.album}
-                            onValueChange={(value) => setNewSong({ ...newSong, album: value ?? "" })}
+                            onValueChange={(value) =>
+                                setNewSong({
+                                    ...newSong,
+                                    album: value ?? ""
+                                })
+                            }
                         >
                             <SelectTrigger className='bg-zinc-800 border-zinc-700'>
                                 <SelectValue placeholder="Select album" />
                             </SelectTrigger>
+
                             <SelectContent className='bg-zinc-800 border-zinc-700'>
-                                <SelectItem value='none'>No Album (Single)</SelectItem>
+                                <SelectItem value='none'>
+                                    No Album (Single)
+                                </SelectItem>
+
                                 {albums.map((album) => (
-                                    <SelectItem key={album._id} value={album._id}>
+                                    <SelectItem
+                                        key={album._id}
+                                        value={album._id}
+                                    >
                                         {album.title}
                                     </SelectItem>
                                 ))}
@@ -224,10 +326,18 @@ const AddSongDialog = () => {
                 </div>
 
                 <DialogFooter>
-                    <Button variant='outline' onClick={() => setIsSongDialogOpen(false)} disabled={isLoading}>
+                    <Button
+                        variant='outline'
+                        onClick={() => setIsSongDialogOpen(false)}
+                        disabled={isLoading}
+                    >
                         Cancel
                     </Button>
-                    <Button onClick={handleSubmit} disabled={isLoading}>
+
+                    <Button
+                        onClick={handleSubmit}
+                        disabled={isLoading}
+                    >
                         {isLoading ? "Uploading..." : "Add Song"}
                     </Button>
                 </DialogFooter>

@@ -2,6 +2,7 @@ import { getAuth } from "@clerk/express";
 import { User } from "../models/user.model.js"
 import { Message } from "../models/message.model.js";
 
+// function untuk mendapatkan data semua user
 export const getAllUsers = async (req, res, next) => {
     try {
         const currentUserId = getAuth(req).userId
@@ -13,6 +14,7 @@ export const getAllUsers = async (req, res, next) => {
     }
 }
 
+// function untuk mendapatkan data pesan dari user lain
 export const getMessages = async (req, res, next) => {
     try {
         const myId = getAuth(req).userId

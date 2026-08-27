@@ -4,8 +4,10 @@ import { useMusicStore } from "../../../stores/useMusicStore"
 import { Button } from "../../../components/ui/button";
 
 const SongsTable = () => {
+    // mengambil data song dan function delete dari music store
     const { songs, isLoading, error, deleteSong } = useMusicStore()
 
+    // menampilkan loading ketika proses mengambil data sedang berjalan
     if (isLoading) {
         return (
             <div className='flex items-center justify-center py-8'>
@@ -14,6 +16,7 @@ const SongsTable = () => {
         );
     }
 
+    // menampilkan pesan error jika terjadi kesalahan saat mengambil data
     if (error) {
         return (
             <div className='flex items-center justify-center py-8'>
@@ -21,6 +24,7 @@ const SongsTable = () => {
             </div>
         );
     }
+
     return (
         <Table>
             <TableHeader>
@@ -32,14 +36,27 @@ const SongsTable = () => {
                     <TableHead className='text-right'>Actions</TableHead>
                 </TableRow>
             </TableHeader>
+
             <TableBody>
+                {/* menampilkan setiap song ke dalam table */}
                 {songs.map((song) => (
                     <TableRow key={song._id} className='hover:bg-zinc-800/50'>
                         <TableCell>
-                            <img src={song.imageUrl} alt={song.title} className='size-10 rounded object-cover' />
+                            <img
+                                src={song.imageUrl}
+                                alt={song.title}
+                                className='size-10 rounded object-cover'
+                            />
                         </TableCell>
-                        <TableCell className='font-medium'>{song.title}</TableCell>
-                        <TableCell>{song.artist}</TableCell>
+
+                        <TableCell className='font-medium'>
+                            {song.title}
+                        </TableCell>
+
+                        <TableCell>
+                            {song.artist}
+                        </TableCell>
+
                         <TableCell>
                             <span className='inline-flex items-center gap-1 text-zinc-400'>
                                 <Calendar className='h-4 w-4' />
@@ -53,6 +70,7 @@ const SongsTable = () => {
                                     variant={"ghost"}
                                     size={"sm"}
                                     className='text-red-400 hover:text-red-300 hover:bg-red-400/10'
+                                    // menghapus song berdasarkan id song yang dipilih
                                     onClick={() => deleteSong(song._id)}
                                 >
                                     <Trash2 className='size-4' />

@@ -6,17 +6,26 @@ import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 const AuthCallbackPage = () => {
+  // mengambil data user yang sedang login dari Clerk
   const { isLoaded, user } = useUser();
+
+  // digunakan untuk berpindah halaman setelah proses login selesai
   const navigate = useNavigate();
+
+  // memastikan proses sync user hanya dijalankan satu kali
   const syncAttempted = useRef(false);
 
+  // function untuk menyimpan atau memperbarui data user ke database
   useEffect(() => {
     const syncUser = async () => {
+      // menunggu Clerk selesai mengambil data user
       if (!isLoaded || !user || syncAttempted.current) return;
 
       try {
+        // menandai bahwa proses sync sudah dijalankan
         syncAttempted.current = true;
 
+        // mengirim data user dari Clerk ke backend
         await axiosInstance.post("/auth/callback", {
           id: user.id,
           firstName: user.firstName,
@@ -26,6 +35,7 @@ const AuthCallbackPage = () => {
       } catch (error) {
         console.log("Error in auth callback", error);
       } finally {
+        // setelah proses selesai, kembali ke halaman utama
         navigate("/");
       }
     };
@@ -38,11 +48,18 @@ const AuthCallbackPage = () => {
       <Card className='w-[90%] max-w-md bg-zinc-900 border-zinc-800'>
         <CardContent className='flex flex-col items-center gap-4 pt-6'>
           <Loader className='size-6 text-emerald-500 animate-spin' />
-          <h3 className='text-zinc-400 text-xl font-bold'>Logging you in</h3>
-          <p className='text-zinc-400 text-sm'>Redirecting...</p>
+
+          <h3 className='text-zinc-400 text-xl font-bold'>
+            Logging you in
+          </h3>
+
+          <p className='text-zinc-400 text-sm'>
+            Redirecting...
+          </p>
         </CardContent>
       </Card>
     </div>
   );
 };
+
 export default AuthCallbackPage;

@@ -41,11 +41,15 @@ export const useMusicStore = create<MusicStore>((set) => ({
         totalUsers: 0
     },
 
+    // function untuk menghapus song berdasarkan id
     deleteSong: async (id) => {
         set({ isLoading: true, error: null })
+
         try {
+            // mengirim request delete ke API
             await axiosInstance.delete(`/admin/songs/${id}`)
 
+            // menghapus song dari state tanpa perlu fetch ulang semua data
             set(state => ({
                 songs: state.songs.filter(song => song._id !== id)
             }))
@@ -59,16 +63,24 @@ export const useMusicStore = create<MusicStore>((set) => ({
         }
     },
 
+    // function untuk menghapus album berdasarkan id
     deleteAlbum: async (id) => {
         set({ isLoading: true, error: null });
+
         try {
+            // mengirim request delete album ke API
             await axiosInstance.delete(`/admin/albums/${id}`);
+
+            // menghapus album dari state dan menghapus relasi album pada song
             set((state) => ({
                 albums: state.albums.filter((album) => album._id !== id),
                 songs: state.songs.map((song) =>
-                    song.albumId === state.albums.find((a) => a._id === id)?.title ? { ...song, album: null } : song
+                    song.albumId === state.albums.find((a) => a._id === id)?.title
+                        ? { ...song, album: null }
+                        : song
                 ),
             }));
+
             toast.success("Album deleted successfully");
         } catch (error: any) {
             toast.error("Failed to delete album: " + error.message);
@@ -77,8 +89,10 @@ export const useMusicStore = create<MusicStore>((set) => ({
         }
     },
 
+    // function untuk mendapatkan semua album
     fetchAlbums: async () => {
         set({ isLoading: true })
+
         try {
             const response = await axiosInstance.get('/albums')
             set({ albums: response.data })
@@ -89,12 +103,13 @@ export const useMusicStore = create<MusicStore>((set) => ({
         }
     },
 
+    // function untuk mendapatkan detail album berdasarkan id
     fetchAlbumsById: async (albumId) => {
         set({ isLoading: true })
+
         try {
             const response = await axiosInstance.get(`/albums/${albumId}`)
             set({ currentAlbum: response.data })
-            set({})
         } catch (error: any) {
             set({ error: error?.response.data.message })
         } finally {
@@ -102,8 +117,10 @@ export const useMusicStore = create<MusicStore>((set) => ({
         }
     },
 
+    // function untuk mendapatkan lagu yang masuk ke dalam featured songs
     fetchFeaturedSongs: async () => {
         set({ isLoading: true, error: null })
+
         try {
             const response = await axiosInstance.get('/songs/featured')
             set({ featuredSongs: response.data })
@@ -114,8 +131,10 @@ export const useMusicStore = create<MusicStore>((set) => ({
         }
     },
 
+    // function untuk mendapatkan lagu yang direkomendasikan untuk user
     fetchMadeForYouSongs: async () => {
         set({ isLoading: true, error: null })
+
         try {
             const response = await axiosInstance.get('/songs/made-for-you')
             set({ madeForYouSongs: response.data })
@@ -126,8 +145,10 @@ export const useMusicStore = create<MusicStore>((set) => ({
         }
     },
 
+    // function untuk mendapatkan lagu yang sedang trending
     fetchTrendingSongs: async () => {
         set({ isLoading: true, error: null })
+
         try {
             const response = await axiosInstance.get('/songs/trending')
             set({ trendingSongs: response.data })
@@ -138,8 +159,10 @@ export const useMusicStore = create<MusicStore>((set) => ({
         }
     },
 
+    // function untuk mendapatkan semua song
     fetchSongs: async () => {
         set({ isLoading: true, error: null })
+
         try {
             const response = await axiosInstance.get('/songs')
             set({ songs: response.data })
@@ -150,8 +173,10 @@ export const useMusicStore = create<MusicStore>((set) => ({
         }
     },
 
+    // function untuk mendapatkan statistik music dan user
     fetchStats: async () => {
         set({ isLoading: true, error: null })
+
         try {
             const response = await axiosInstance.get('/stats')
             set({ stats: response.data })

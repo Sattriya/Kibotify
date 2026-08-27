@@ -1,10 +1,12 @@
 import { User } from "../models/user.model.js"
 
+// function untuk menyimpan atau memperbarui data user dari Clerk ke database MongoDB
 export const authCallback = async (req, res, next) => {
     try {
         const { id, firstName, lastName, imageUrl } = req.body
 
         const user = await User.findOneAndUpdate(
+            // mencari user berdasarkan clerkId
             { clerkId: id },
             {
                 clerkId: id,
@@ -18,6 +20,7 @@ export const authCallback = async (req, res, next) => {
             }
         );
 
+        // jika user belum terdaftar / dia sedang register, maka buatkan data baru
         if (!user) {
             await User.create({
                 clerkId: id,

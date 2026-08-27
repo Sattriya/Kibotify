@@ -2,6 +2,7 @@ import { Song } from "../models/song.model.js";
 import { Album } from "../models/album.model.js"
 import cloudinary from "../lib/cloudinary.js";
 
+// function untuk mengupload file ke Cloudinary dan mengembalikan URL file yang sudah diupload
 const uploadToCloudinary = async (file) => {
     try {
         const result = await cloudinary.uploader.upload(file.tempFilePath, {
@@ -14,6 +15,7 @@ const uploadToCloudinary = async (file) => {
     }
 }
 
+// function untuk membuat song baru dengan mengupload file audio dan image ke Cloudinary lalu menyimpannya ke database
 export const createSong = async (req, res, next) => {
     try {
         if (!req.files || !req.files.audioFile || !req.files.imageFile) {
@@ -38,6 +40,7 @@ export const createSong = async (req, res, next) => {
 
         await song.save()
 
+        // jika song memiliki album, tambahkan id song ke array songs pada album tersebut
         if (albumId) {
             await Album.findByIdAndUpdate(albumId, ({
                 $push: {
@@ -53,11 +56,13 @@ export const createSong = async (req, res, next) => {
     }
 }
 
+// function untuk menghapus song dari database sekaligus menghapus referensi song tersebut dari album
 export const deleteSong = async (req, res, next) => {
     try {
         const { id } = req.params
         const song = await Song.findById(id)
 
+        // menghapus id song dari array songs pada album
         if (song.albumId) {
             await Album.updateOne(
                 { _id: song.albumId },
@@ -78,6 +83,7 @@ export const deleteSong = async (req, res, next) => {
     }
 }
 
+// function untuk membuat album baru dengan mengupload artwork album ke Cloudinary lalu menyimpan datanya ke database
 export const createAlbum = async (req, res, next) => {
     try {
         const { title, artist, releaseYear } = req.body
@@ -101,11 +107,17 @@ export const createAlbum = async (req, res, next) => {
     }
 }
 
+// function untuk menghapus album beserta semua song yang memiliki albumId tersebut
 export const deleteAlbum = async (req, res, next) => {
     try {
         const { id } = req.params
+
+        // menghapus semua song yang terhubung dengan album
         await Song.deleteMany({ albumId: id })
+
+        // menghapus album setelah semua song yang terhubung dihapus
         await Album.findByIdAndDelete(id)
+
         res.status(200).json({ message: "Album and its songs deleted successfully" })
     } catch (error) {
         console.error("Error deleting album:", error)
@@ -113,6 +125,7 @@ export const deleteAlbum = async (req, res, next) => {
     }
 }
 
+// function untuk mengecek apakah request berasal dari user yang memiliki akses admin
 export const checkAdmin = async (req, res, next) => {
     res.status(200).json({ message: "You are an admin", admin: true })
 }
